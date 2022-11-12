@@ -11,13 +11,16 @@ public class MoveCharacter : MonoBehaviour
 
     private Vector3 moveDirection;
 
-    private bool canMove = false;
+    private bool mustMove = false;
 
+    [SerializeField] private Animator animator; 
     [SerializeField] private float WidthRoad;
     [SerializeField] private float Speed = 1;
     [SerializeField] private float SpeedLimitedX = 1;
     [SerializeField, Range(0.1f, 4)] private float Sensitivity = 2;
     [SerializeField, Range(0.1f, 2)] private float OffSetSideOfRoad = 0.2f;
+
+    public bool CanRun = false;
 
     private void Start()
     {
@@ -31,7 +34,7 @@ public class MoveCharacter : MonoBehaviour
         {
             pivotPlayerPositionX = transform.position.x;
             pivotMousePositionX = Input.mousePosition.x;
-            canMove = true; 
+            mustMove = true;
         }
 
         if (Input.GetMouseButton(0))
@@ -41,15 +44,22 @@ public class MoveCharacter : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            canMove = false;
-            deltaMousePositionX = 0;            
+            mustMove = false;
+            deltaMousePositionX = 0;
         }
     }
 
     private void FixedUpdate()
     {
-        if (!canMove) return;    
-               
+        if (!mustMove || !CanRun)
+        {
+
+            animator.SetBool("IsRun", false);
+            return;
+        }
+
+        animator.SetBool("IsRun", true);
+
         float targetPositionX = pivotPlayerPositionX +
             (deltaMousePositionX / pixelPerUnit);
         float directionX;

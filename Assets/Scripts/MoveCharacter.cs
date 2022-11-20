@@ -8,15 +8,15 @@ public class MoveCharacter : MonoBehaviour
     private float pivotPlayerPositionX;
     private float deltaMousePositionX;
     private float pixelPerUnit;
+    private float widthRoad;
 
     private Vector3 moveDirection;
 
     private bool mustMove = false;
 
-    [SerializeField] private Animator animator; 
-    [SerializeField] private float WidthRoad;
+    [SerializeField] private Animator Animator; 
+    [SerializeField] private GameObject Road;   
     [SerializeField] private float Speed = 1;
-    [SerializeField] private float SpeedLimitedX = 1;
     [SerializeField, Range(0.1f, 4)] private float Sensitivity = 2;
     [SerializeField, Range(0.1f, 2)] private float OffSetSideOfRoad = 0.2f;
 
@@ -25,7 +25,8 @@ public class MoveCharacter : MonoBehaviour
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
-        pixelPerUnit = Screen.width / WidthRoad;
+        widthRoad = Road.transform.localScale.x*10;
+        pixelPerUnit = Screen.width / widthRoad;
     }
 
     private void Update()
@@ -54,24 +55,23 @@ public class MoveCharacter : MonoBehaviour
         if (!mustMove || !CanRun)
         {
 
-            animator.SetBool("IsRun", false);
+            Animator.SetBool("IsRun", false);
             return;
         }
 
-        animator.SetBool("IsRun", true);
+        Animator.SetBool("IsRun", true);
 
         float targetPositionX = pivotPlayerPositionX +
             (deltaMousePositionX / pixelPerUnit);
         float directionX;
 
-        if (Mathf.Abs(targetPositionX) < WidthRoad / 2)
+        if (Mathf.Abs(targetPositionX) < widthRoad / 2)
             directionX = targetPositionX - transform.position.x;
         else
-            directionX = (targetPositionX > 0 ? WidthRoad : -WidthRoad) / 2 - transform.position.x +
+            directionX = (targetPositionX > 0 ? widthRoad : -widthRoad) / 2 - transform.position.x +
                 (targetPositionX > 0 ? -OffSetSideOfRoad : OffSetSideOfRoad);
 
-        moveDirection = Vector3.right *
-                Mathf.Clamp(directionX, -SpeedLimitedX, SpeedLimitedX);
+        moveDirection = Vector3.right * directionX;
         moveDirection += transform.forward * Speed;
         characterController.Move(moveDirection); 
         
